@@ -1,0 +1,131 @@
+---
+title: "STAT545_hw05_exploration"
+output: github_document
+always_allow_html": yes
+---
+
+```{r}
+library(gapminder)
+library(tidyverse)
+library(plotly)
+library(scales)
+library(RColorBrewer)
+```
+
+# Part 1: Factor management
+
+Let's compare the use of filter() vs droplevels() upon removing "Oceania" from the gapminder data set.
+
+```{r}
+gap_filter <- gapminder %>% 
+  filter(continent != "Oceania")
+
+gap_drop <- gap_filter %>% 
+  droplevels()
+
+str(gapminder)
+str(gap_filter)
+str(gap_drop)
+
+```
+
+*Comments:* Use of filter() does not effect a change in the number of levels in country (142) or continent (5) factors, whereas droplevels() displays only the observed levels in country (140) and continent (4) factors. As expected, the dropped level in continent is "Oceania"; correspondingly, the dropped levels in country are "Australia" and "New Zealand".
+
+
+Next, let's compare the use of arrange() and fct_reorder() to reorganize continent by GDP per capita.
+
+```{r}
+#With arrange()
+gap_A <- gap_drop %>% 
+  arrange(continent, gdpPercap)
+
+#Reordered factors
+gap_R <- gap_drop %>% 
+  mutate(continent = fct_reorder(continent, gdpPercap, .fun = max))
+
+#Reordered factors and with arrange()
+gap_RA <- gap_R %>% 
+  arrange(continent, gdpPercap)
+
+
+head(gap_drop)
+head(gap_A)
+head(gap_R)
+head(gap_RA)
+
+```
+
+*Comments:* In the head of the tables displayed above, it is seen that the use of arrange() reorganizes GDP per capita in ascending order within each continent grouping. The use of fct_reorder() has no observable effect on the table itself. The use of both functions leads only to the observable effects of arrange().
+
+Let's check the plots:
+
+```{r}
+gap_drop %>% ggplot(aes(continent, gdpPercap)) + geom_boxplot() + scale_y_log10()
+gap_A %>% ggplot(aes(continent, gdpPercap)) + geom_boxplot() + scale_y_log10()
+gap_R %>% ggplot(aes(continent, gdpPercap)) + geom_boxplot() + scale_y_log10()
+gap_RA %>% ggplot(aes(continent, gdpPercap)) + geom_boxplot() + scale_y_log10()
+```
+
+*Comments:* The use of arrange() only operates on the table output and has no effect on the plot. This makes sense intuitively, as the data points are still the same and thus the plot output will be the same, so long as the grouping is still by continent and plotted against GDP per capita. The use of fct_reorder() on the other hand does lead to an observable difference in the plot. Here, I called the function to reorder by the summary statistic maximum, so that the boxplot is arranged in order of increasing maxima. In this case, Europe has the second highest maximum, so fct_reorder() has changed its position accordingly from the default alphabetical ordering of contient factors.
+
+# Part 2: Files I/O
+
+Let's output gap_RA tibble to a CSV file and then read it back in again.
+
+```{r}
+write_csv(gap_RA, "gap_RA.csv")
+
+check_gap_RA <- read_csv("gap_RA.csv")
+
+head(gap_RA)
+head(check_gap_RA)
+```
+
+*Comments:* The head of gap_RA and the newly read-in CSV stored in check_gap_RA look to be the same. Success!
+
+# Part 2: Visualization design
+
+*Preamble:* Let's revisit a plot made using `ggplot` from a previous assignment and make it even better. I have chosen to use the following plot: Weighted mean of life expectancy (by population) across continents.
+
+```{r}
+#Set up parameters of the plot by finding the weighted mean by population, and then storing in a new tibble, A.
+A <- gapminder %>% 
+      filter(year == 1952 | year == 2002 | year == 1977) %>% 
+      group_by(continent, country, year) %>% #Grouping by year in order to facet plot later
+      mutate(wm = round(weighted.mean(lifeExp, pop, na.rm = FALSE), digits = 1)) %>% 
+      transmute(lifeExp, pop, wm) #transmute removes all columns other than the ones specified
+
+#Create a ggplot (this is the original)
+
+P <- ggplot(A, aes(x = continent, y = wm, color = continent)) +
+  geom_jitter(alpha = 0.5) + 
+  labs(title = "Figure 2: Weighted mean of life expectancy (by population) across continents", 
+       x = "Continent", y = "Life expectancy") + #Add title and axis labels
+  facet_grid(.~year) #Facet by year. In this case, 'A' has three years of data.
+
+P
+
+#Create an improved ggplot
+
+P_new <- ggplot(A, aes(x = continent, y = wm, color = continent)) +
+  geom_jitter() + 
+  labs(title = "Figure 2: Weighted mean of life expectancy (by population) across continents", 
+       x = "Continent", y = "Life expectancy") + #Add title and axis labels
+  facet_grid(.~year) +
+  theme_classic() + #Removes grid lines for a cleaner look
+  theme(axis.text.x  = element_text(angle=65, vjust=0.5, size=8),
+        axis.text = element_text(size = 10),
+        strip.background = element_rect(colour = "white"),
+        strip.text = element_text(size = 14)
+        ) +
+  scale_y_continuous(breaks = 1:20 * 5) +
+  scale_colour_brewer(palette = "Set1")
+
+P_new
+
+#Convert this to a `plotly` plot:
+ 
+ggplotly(P_new)
+
+
+```
