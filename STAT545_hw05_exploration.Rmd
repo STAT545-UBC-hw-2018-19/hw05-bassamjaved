@@ -10,6 +10,7 @@ library(tidyverse)
 library(plotly)
 library(scales)
 library(RColorBrewer)
+library(pkgconfig)
 ```
 
 # Part 1: Factor management
@@ -129,3 +130,73 @@ ggplotly(P_new)
 
 
 ```
+
+# Part 4: Writing figures to file
+
+Now, we save the plots from above to file.
+
+```{r}
+ggsave("plot_raster.jpg", plot = P_new, width = 8, height = 4, dpi = 100) #save as a raster file format (.jpg)
+ggsave("plot_vector.eps", plot = P_new) #save as a vector file format (.eps)
+
+```
+
+# But I want to do more!
+
+Let's make an addition to gapminder that has countries which have a space program that have achieved space flight.
+
+```{r}
+space_programs <- tibble(country = 
+                           factor(c("China",
+                             "Iran",
+                             "Israel",
+                             "Italy",
+                             "Korea, Rep.", 
+                             "Korea, Dem. Rep.",
+                             "India",
+                             "Japan",
+                             "United States",
+                             "France",
+                             "Ukraine",
+                             "Russia",
+                             "Europe")),
+                         space_agency = 
+                           factor(c("China National Space Administration",
+                             "Iranian Space Agency",
+                             "Israeli Space Agency",
+                             "Italian Space Agency", 
+                             "Korea Aerospace Research Institute (North)",
+                             "Korea Aerospace Research Institute (South)",
+                             "Indian Space Research Organization",
+                             "Japan Aerospace Exploration Agency",
+                             "National Aeronautics and Space Administration",
+                             "National Center of Space Research",
+                             "National Space Agency of Ukraine",
+                             "Russian Federal Space Agency",
+                             "European Space Agency"))
+)
+
+#space_programs_Europe <- tibble(continent = "Europe",
+ #                        space_agency = "European Space Agency")
+
+A <- left_join(gapminder, space_programs, by = "country") %>% 
+  filter(year == 2002) %>%
+  transmute(country, gdpPercap, space_agency, continent) %>% 
+  filter(space_agency != "NA")
+
+(filter(A, gdpPercap > 25000))
+
+B <- A %>% mutate(fct_collapse("High_gdpPercap" = 
+                                       c("National Center of Space Research", 
+                                         "Italian Space Agency", 
+                                         "Japan Aerospace Exploration Agency", 
+                                         "National Aeronautics and Space Administration"
+                                       )
+  ))
+
+levels(B)
+
+ggplot(C, aes(gdpPercap, space_agency)) + geom_count()
+
+```
+
