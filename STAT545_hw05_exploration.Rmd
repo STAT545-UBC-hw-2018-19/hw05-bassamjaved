@@ -135,7 +135,6 @@ P_new
  
 ggplotly(P_new)
 
-
 ```
 
 # Part 4: Writing figures to file
@@ -147,6 +146,12 @@ ggsave("plot_raster.jpg", plot = P_new, width = 8, height = 4, dpi = 100) #save 
 ggsave("plot_vector.eps", plot = P_new) #save as a vector file format (.eps)
 
 ```
+
+Here are the plot images, first as a raster and then a vector:
+
+![plot_raster.jpg](https://raw.github.com/bassamjaved/hw05/plot_raster.jpg)
+
+
 
 # But I want to do more!
 
