@@ -54,9 +54,16 @@ head(gap_A)
 head(gap_R)
 head(gap_RA)
 
+levels(gap_drop$continent)
+levels(gap_A$continent)
+levels(gap_R$continent)
+levels(gap_RA$continent)
+
 ```
 
 *Comments:* In the head of the tables displayed above, it is seen that the use of arrange() reorganizes GDP per capita in ascending order within each continent grouping. The use of fct_reorder() has no observable effect on the table itself. The use of both functions leads only to the observable effects of arrange().
+
+Usings levels() to check the factor levels, there is no difference after using arrange(). After fct_reorder(), the order of the factors changes. In this case, Europe has the second highest maximum, so fct_reorder() has changed its position accordingly from the default alphabetical ordering of contient factors.
 
 Let's check the plots:
 
@@ -67,7 +74,7 @@ gap_R %>% ggplot(aes(continent, gdpPercap)) + geom_boxplot() + scale_y_log10()
 gap_RA %>% ggplot(aes(continent, gdpPercap)) + geom_boxplot() + scale_y_log10()
 ```
 
-*Comments:* The use of arrange() only operates on the table output and has no effect on the plot. This makes sense intuitively, as the data points are still the same and thus the plot output will be the same, so long as the grouping is still by continent and plotted against GDP per capita. The use of fct_reorder() on the other hand does lead to an observable difference in the plot. Here, I called the function to reorder by the summary statistic maximum, so that the boxplot is arranged in order of increasing maxima. In this case, Europe has the second highest maximum, so fct_reorder() has changed its position accordingly from the default alphabetical ordering of contient factors.
+*Comments:* The use of arrange() only operates on the table output and has no effect on the plot. This makes sense intuitively, as the data points are still the same and thus the plot output will be the same, so long as the grouping is still by continent and plotted against GDP per capita. The use of fct_reorder() on the other hand does lead to an observable difference in the plot. Here, I called the function to reorder by the summary statistic maximum, so that the boxplot is arranged in order of increasing maxima. The ordering of the factors is the same as that observed using levels() above.
 
 # Part 2: Files I/O
 
@@ -143,60 +150,61 @@ ggsave("plot_vector.eps", plot = P_new) #save as a vector file format (.eps)
 
 # But I want to do more!
 
-Let's make an addition to gapminder that has countries which have a space program that have achieved space flight.
+Let's explore other functions in the forcats package for manipulating factors. I will use an excerpt of countries in the gapminder data frame and add language spoken. 
 
 ```{r}
-space_programs <- tibble(country = 
-                           factor(c("China",
-                             "Iran",
-                             "Israel",
-                             "Italy",
-                             "Korea, Rep.", 
-                             "Korea, Dem. Rep.",
-                             "India",
-                             "Japan",
-                             "United States",
+#Create factor to join with gapminder excerpt
+language_table <- tibble(country = 
+                           factor(c("Italy",
                              "France",
-                             "Ukraine",
-                             "Russia",
-                             "Europe")),
-                         space_agency = 
-                           factor(c("China National Space Administration",
-                             "Iranian Space Agency",
-                             "Israeli Space Agency",
-                             "Italian Space Agency", 
-                             "Korea Aerospace Research Institute (North)",
-                             "Korea Aerospace Research Institute (South)",
-                             "Indian Space Research Organization",
-                             "Japan Aerospace Exploration Agency",
-                             "National Aeronautics and Space Administration",
-                             "National Center of Space Research",
-                             "National Space Agency of Ukraine",
-                             "Russian Federal Space Agency",
-                             "European Space Agency"))
-)
+                             "Spain",
+                             "Mexico",
+                             "Austria",
+                             "Germany",
+                             "Morocco",
+                             "Angola",
+                             "Brazil",
+                             "Egypt")),
+                         language = 
+                           factor(c("Italian",
+                             "French",
+                             "Spanish",
+                             "Spanish",
+                             "German",
+                             "German",
+                             "French",
+                             "Portuguese",
+                             "Portuguese",
+                             "Arabic"))
+                           )
 
-#space_programs_Europe <- tibble(continent = "Europe",
- #                        space_agency = "European Space Agency")
-
-A <- left_join(gapminder, space_programs, by = "country") %>% 
+gap_small <- left_join(gapminder, language_table, by = "country") %>% 
   filter(year == 2002) %>%
-  transmute(country, gdpPercap, space_agency, continent) %>% 
-  filter(space_agency != "NA")
+  transmute(country, continent, language) %>% 
+  filter(language != "NA") %>% 
+  droplevels()
 
-(filter(A, gdpPercap > 25000))
+#Show the use of collapse (Italian and Arabic into Other), recode (Spanish to Espanol), and relevel (French first)
 
-B <- A %>% mutate(fct_collapse("High_gdpPercap" = 
-                                       c("National Center of Space Research", 
-                                         "Italian Space Agency", 
-                                         "Japan Aerospace Exploration Agency", 
-                                         "National Aeronautics and Space Administration"
-                                       )
-  ))
+gap_small_collapse <- gap_small %>% 
+  mutate(language = fct_collapse(language,
+                                     Other = 
+                                       c("Italian",
+                                         "Arabic"
+                                         )
+                                     )
+         )
 
-levels(B)
+gap_small_recode <- gap_small %>% 
+  mutate(language = fct_recode(language, "Espanol" = "Spanish"))
 
-ggplot(C, aes(gdpPercap, space_agency)) + geom_count()
+gap_small_relevel <- gap_small %>% 
+  mutate(language = fct_relevel(language, "French"))
+
+levels(gap_small_collapse$language)
+levels(gap_small_recode$language)
+levels(gap_small_relevel$language)
 
 ```
 
+*Comments:* fct_collapse() can collapse multiple factor levels into a new one. Here I put "Italian" and "Arabic" into a new one called "Other". fct_recode() allows a factor level to be renamed. Here I changed "Spanish" to "Espanol". Finally, fct_relevel() changes the order manually. Here I put "French" first.
