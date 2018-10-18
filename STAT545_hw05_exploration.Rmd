@@ -1,7 +1,7 @@
 ---
 title: "STAT545_hw05_exploration"
 output: github_document
-always_allow_html": yes
+always_allow_html: yes
 ---
 
 ```{r}
@@ -10,12 +10,11 @@ library(tidyverse)
 library(plotly)
 library(scales)
 library(RColorBrewer)
-library(pkgconfig)
 ```
 
 # Part 1: Factor management
 
-Let's compare the use of filter() vs droplevels() upon removing "Oceania" from the gapminder data set.
+Let's compare the use of `filter()` vs `droplevels()` upon removing "Oceania" from the gapminder data set.
 
 ```{r}
 gap_filter <- gapminder %>% 
@@ -30,10 +29,10 @@ str(gap_drop)
 
 ```
 
-*Comments:* Use of filter() does not effect a change in the number of levels in country (142) or continent (5) factors, whereas droplevels() displays only the observed levels in country (140) and continent (4) factors. As expected, the dropped level in continent is "Oceania"; correspondingly, the dropped levels in country are "Australia" and "New Zealand".
+*Comments:* Use of `filter()` does not effect a change in the number of levels in country (142) or continent (5) factors, whereas `droplevels()` displays only the observed levels in country (140) and continent (4) factors. As expected, the dropped level in continent is "Oceania"; correspondingly, the dropped levels in country are "Australia" and "New Zealand".
 
 
-Next, let's compare the use of arrange() and fct_reorder() to reorganize continent by GDP per capita.
+Next, let's compare the use of `arrange()` and `fct_reorder()` to reorganize continent by GDP per capita.
 
 ```{r}
 #With arrange()
@@ -61,9 +60,9 @@ levels(gap_RA$continent)
 
 ```
 
-*Comments:* In the head of the tables displayed above, it is seen that the use of arrange() reorganizes GDP per capita in ascending order within each continent grouping. The use of fct_reorder() has no observable effect on the table itself. The use of both functions leads only to the observable effects of arrange().
+*Comments:* In the head of the tables displayed above, it is seen that the use of `arrange()` reorganizes GDP per capita in ascending order within each continent grouping. The use of `fct_reorder()` has no observable effect on the table itself. The use of both functions leads only to the observable effects of `arrange()`.
 
-Usings levels() to check the factor levels, there is no difference after using arrange(). After fct_reorder(), the order of the factors changes. In this case, Europe has the second highest maximum, so fct_reorder() has changed its position accordingly from the default alphabetical ordering of contient factors.
+Usings `levels()` to check the factor levels, there is no difference after using `arrange()`. After `fct_reorder()`, the order of the factors changes. In this case, Europe has the second highest maximum, so `fct_reorder()` has changed its position accordingly from the default alphabetical ordering of contient factors.
 
 Let's check the plots:
 
@@ -74,7 +73,7 @@ gap_R %>% ggplot(aes(continent, gdpPercap)) + geom_boxplot() + scale_y_log10()
 gap_RA %>% ggplot(aes(continent, gdpPercap)) + geom_boxplot() + scale_y_log10()
 ```
 
-*Comments:* The use of arrange() only operates on the table output and has no effect on the plot. This makes sense intuitively, as the data points are still the same and thus the plot output will be the same, so long as the grouping is still by continent and plotted against GDP per capita. The use of fct_reorder() on the other hand does lead to an observable difference in the plot. Here, I called the function to reorder by the summary statistic maximum, so that the boxplot is arranged in order of increasing maxima. The ordering of the factors is the same as that observed using levels() above.
+*Comments:* The use of `arrange()` only operates on the table output and has no effect on the plot. This makes sense intuitively, as the data points are still the same and thus the plot output will be the same, so long as the grouping is still by continent and plotted against GDP per capita. The use of `fct_reorder()` on the other hand does lead to an observable difference in the plot. Here, I called the function to reorder by the summary statistic maximum, so that the boxplot is arranged in order of increasing maxima. The ordering of the factors is the same as that observed using `levels()` above.
 
 # Part 2: Files I/O
 
@@ -108,8 +107,8 @@ A <- gapminder %>%
 P <- ggplot(A, aes(x = continent, y = wm, color = continent)) +
   geom_jitter(alpha = 0.5) + 
   labs(title = "Figure 2: Weighted mean of life expectancy (by population) across continents", 
-       x = "Continent", y = "Life expectancy") + #Add title and axis labels
-  facet_grid(.~year) #Facet by year. In this case, 'A' has three years of data.
+       x = "Continent", y = "Life expectancy") +
+  facet_grid(.~year)
 
 P
 
@@ -120,14 +119,14 @@ P_new <- ggplot(A, aes(x = continent, y = wm, color = continent)) +
   labs(title = "Figure 2: Weighted mean of life expectancy (by population) across continents", 
        x = "Continent", y = "Life expectancy") + #Add title and axis labels
   facet_grid(.~year) +
-  theme_classic() + #Removes grid lines for a cleaner look
+  theme_classic() +
   theme(axis.text.x  = element_text(angle=65, vjust=0.5, size=8),
         axis.text = element_text(size = 10),
         strip.background = element_rect(colour = "white"),
         strip.text = element_text(size = 14)
-        ) +
-  scale_y_continuous(breaks = 1:20 * 5) +
-  scale_colour_brewer(palette = "Set1")
+        ) + #modify text labels and other plot elements
+  scale_y_continuous(breaks = 1:20 * 5) + #set y-axis numbering
+  scale_colour_brewer(palette = "Set1") #set color scheme
 
 P_new
 
@@ -136,6 +135,10 @@ P_new
 ggplotly(P_new)
 
 ```
+
+*Comments:* The improved `ggplot` is more visually impactful by stripping away unnecessary elements, resizing/relabelling, and providing more appealing color scheme.
+
+The `plotly` plot is even more impactful in that it is a dynamic image that allows the viewer to effectively interact with the plotted data. The viewer can observe the values that underlie each point, zoom to a specific region of the plot, or remove geometric layers.
 
 # Part 4: Writing figures to file
 
@@ -150,6 +153,8 @@ ggsave("plot_vector.eps", plot = P_new) #save as a vector file format (.eps)
 Here are the plot images, first as a raster and then a vector:
 
 ![plot_raster.jpg](https://github.com/STAT545-UBC-students/hw05-bassamjaved/blob/master/plot_raster.jpg)
+
+![plot_vector.eps](https://github.com/STAT545-UBC-students/hw05-bassamjaved/blob/master/plot_vector.eps)
 
 
 # But I want to do more!
@@ -211,4 +216,6 @@ levels(gap_small_relevel$language)
 
 ```
 
-*Comments:* fct_collapse() can collapse multiple factor levels into a new one. Here I put "Italian" and "Arabic" into a new one called "Other". fct_recode() allows a factor level to be renamed. Here I changed "Spanish" to "Espanol". Finally, fct_relevel() changes the order manually. Here I put "French" first.
+*Comments:* `fct_collapse()` can collapse multiple factor levels into a new one. Here I put "Italian" and "Arabic" into a new one called "Other". `fct_recode()` allows a factor level to be renamed. Here I changed "Spanish" to "Espanol". Finally, `fct_relevel()` changes the order manually. Here I put "French" first.
+
+## End of file
