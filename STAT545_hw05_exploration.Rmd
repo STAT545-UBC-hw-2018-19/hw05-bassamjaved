@@ -150,16 +150,14 @@ ggsave("plot_vector.eps", plot = P_new) #save as a vector file format (.eps)
 
 ```
 
-Here are the plot images, first as a raster and then a vector:
+Here is the raster plot image embedded into the file:
 
 ![plot_raster.jpg](https://github.com/STAT545-UBC-students/hw05-bassamjaved/blob/master/plot_raster.jpg)
-
-![plot_vector.eps](https://github.com/STAT545-UBC-students/hw05-bassamjaved/blob/master/plot_vector.eps)
 
 
 # But I want to do more!
 
-Let's explore other functions in the forcats package for manipulating factors. I will use an excerpt of countries in the gapminder data frame and add language spoken. 
+*Preamble:* Let's explore other functions in the forcats package for manipulating factors. I will use an excerpt of countries in the gapminder data frame and add language spoken. 
 
 ```{r}
 #Create factor to join with gapminder excerpt
