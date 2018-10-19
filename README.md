@@ -14,7 +14,7 @@ RColorBrewer
 [hw05_exploration.md](https://github.com/STAT545-UBC-students/hw04-bassamjaved/blob/master/STAT545_hw05_exploration.md)<br/>
 folder [hw05_exploration_files](https://github.com/STAT545-UBC-students/hw05-bassamjaved/tree/master/STAT545_hw05_exploration_files/figure-gfm) containing plot images<br/>
 [plot_raster.jpg](https://github.com/STAT545-UBC-students/hw05-bassamjaved/blob/master/plot_raster.jpg)<br/>
-[plot_vector.eps](https://github.com/STAT545-UBC-students/hw05-bassamjaved/blob/master/plot_vector.eps)<br/.
+[plot_vector.eps](https://github.com/STAT545-UBC-students/hw05-bassamjaved/blob/master/plot_vector.eps)<br/>
 [gap_RA.csv](https://github.com/STAT545-UBC-students/hw05-bassamjaved/blob/master/gap_RA.csv)
 
 ### Purpose
