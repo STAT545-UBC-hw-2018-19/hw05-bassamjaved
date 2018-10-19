@@ -11,7 +11,7 @@ RColorBrewer
 ### Contents
 
 [hw05_exploration.Rmd](https://github.com/STAT545-UBC-students/hw05-bassamjaved/blob/master/STAT545_hw05_exploration.Rmd)<br/>
-[hw05_exploration.md](https://github.com/STAT545-UBC-students/hw04-bassamjaved/blob/master/STAT545_hw05_exploration.md)<br/>
+[hw05_exploration.md](https://github.com/STAT545-UBC-students/hw05-bassamjaved/blob/master/STAT545_hw05_exploration.md)<br/>
 folder [hw05_exploration_files](https://github.com/STAT545-UBC-students/hw05-bassamjaved/tree/master/STAT545_hw05_exploration_files/figure-gfm) containing plot images<br/>
 [plot_raster.jpg](https://github.com/STAT545-UBC-students/hw05-bassamjaved/blob/master/plot_raster.jpg)<br/>
 [plot_vector.eps](https://github.com/STAT545-UBC-students/hw05-bassamjaved/blob/master/plot_vector.eps)<br/>
